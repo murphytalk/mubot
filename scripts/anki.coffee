@@ -57,7 +57,6 @@ add_word_to_anki = (robot, msg, word) ->
         Reverse: "y"
       }
     })
-    msg.send data
     robot.http(anki_url)
     .header('Accept', 'text/plain')
     .post(data) (err, res, body) ->
