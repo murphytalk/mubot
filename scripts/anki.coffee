@@ -1,3 +1,12 @@
+# Description:
+#   Lookup word in dictionary and add what is found to Anki
+#
+# Commands:
+#   hubot dict <word> - lookup a word in dictionary
+#   hubot anki <word> - lookup a word in dictionary and add results to Anki
+
+
+#http://stackoverflow.com/questions/4214731/how-do-i-define-global-variables-in-coffeescript
 root = exports ? this
 
 root.count = 1
@@ -59,12 +68,12 @@ add_word_to_anki = (robot, msg, word) ->
 
 
 module.exports = (robot) ->
-  robot.respond /dict (.*)/i, (msg) ->
+  robot.respond /dict *(.*)/i, (msg) ->
     reset()
     word = msg.match[1]
     lookup_dict robot, word, msg
 
-  robot.respond /anki (.*)/i, (msg) ->
+  robot.respond /anki *(.*)/i, (msg) ->
     reset()
     word = msg.match[1]
     lookup_dict robot, word, msg, add_word_to_anki
