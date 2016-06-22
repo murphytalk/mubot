@@ -164,25 +164,4 @@ Where `<adapter>` is the name of your adapter without the `hubot-` prefix.
 - [deploy-unix](https://github.com/github/hubot/blob/master/docs/deploying/unix.md)
 - [deploy-windows](https://github.com/github/hubot/blob/master/docs/deploying/windows.md)
 
-```coffeescript
-word='help'
-
-fs = require 'fs'
-data = JSON.parse fs.readFileSync "#{word}.json",'utf8'
-
-count=1
-meaning=''
-pronunciation=''
-example=''
-
-parse_result = (result) ->
-  meaning = "#{meaning}#{count}-(#{result.part_of_speech}) " + (if result.senses[0].definition? then result.senses[0].definition else result.senses[0].signpost) + '\n'
-  pronunciation = "#{pronunciation}#{count}-" + (if result.pronunciations? then result.pronunciations[0].ipa else '') + '\n'
-  example = "#{example}#{count}-"+ (if result.senses[0].examples? then result.senses[0].examples[0].text else '') + '\n'
-  count++
-
-parse_result result for result in data.results when result.headword is word
-console.log "meaning:\n#{meaning}Pronunciation:\n#{pronunciation}Examples:\n#{example}"
-```
-
 

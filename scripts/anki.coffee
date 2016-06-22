@@ -18,7 +18,7 @@ parse_result = (result) ->
   root.count++
 
 
-lookup_dict = (robot, word, msg) ->
+lookup_dict = (robot, word, msg, anki) ->
   dict_url = "http://api.pearson.com/v2/dictionaries/ldoce5/entries?headword=#{word}"
   robot.http(dict_url)
   .header('Accept', 'application/json')
@@ -31,18 +31,31 @@ lookup_dict = (robot, word, msg) ->
         msg.send "Master, are you sure '#{word}' is a real word?"
       else
         parse_result result for result in data.results when result.headword is word
-        msg.send "Meaning:\n#{root.meaning}Pronunciation:\n#{root.pronunciation}Examples:\n#{root.example}"
+        if anki?
+          anki(robot,msg, word)
+        else
+          msg.send "Meaning:\n#{root.meaning}Pronunciation:\n#{root.pronunciation}Examples:\n#{root.example}"
 
 add_word_to_anki = (robot, msg, word) ->
     anki_url = "http://127.0.0.1:27701/collection/murphy/add_note"
-    #todo: post data
+    data = JSON.stringify({
+      model: "English"
+      fields: {
+        Word: word
+        Meaning: root.meaning
+        Phonetic: root.pronunciation
+        Example: root.example
+        Reverse: "y"
+      }
+    })
+    msg.send data
     robot.http(anki_url)
     .header('Accept', 'text/plain')
-    .post() (err, res, body) ->
+    .post(data) (err, res, body) ->
       if err or res.statusCode != 200
         msg.send "Master, something is wrong with Anki, its status code is #{res.statusCode}"
       else
-        msg.send "Added to Anki:#{word}\n#{meaning}"
+        msg.send "Added to Anki!\nMeaning:\n#{root.meaning}Pronunciation:\n#{root.pronunciation}Examples:\n#{root.example}"
 
 
 module.exports = (robot) ->
@@ -54,4 +67,5 @@ module.exports = (robot) ->
   robot.respond /anki (.*)/i, (msg) ->
     reset()
     word = msg.match[1]
-    add_word_to_anki robot, msg, word
+    lookup_dict robot, word, msg, add_word_to_anki
+
